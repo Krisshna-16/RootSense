@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, TreePine, AlertTriangle, BarChart3, Leaf, Home } from "lucide-react"
+import { LayoutDashboard, TreePine, AlertTriangle, BarChart3, Leaf, Home, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { UserButton, useUser } from "@clerk/nextjs"
 
@@ -12,6 +12,7 @@ const navigation = [
   { name: "Trees", href: "/trees", icon: TreePine },
   { name: "Civic Issues", href: "/issues", icon: AlertTriangle },
   { name: "Impact", href: "/impact", icon: BarChart3 },
+  { name: "Admin", href: "/admin", icon: Shield },
 ]
 
 export function AppSidebar() {

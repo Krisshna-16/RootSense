@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { LayoutDashboard, TreePine, AlertTriangle, BarChart3, Leaf, Home, Menu, X } from "lucide-react"
+import { LayoutDashboard, TreePine, AlertTriangle, BarChart3, Leaf, Home, Menu, X, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { UserButton } from "@clerk/nextjs"
@@ -14,6 +14,7 @@ const navigation = [
   { name: "Trees", href: "/trees", icon: TreePine },
   { name: "Civic Issues", href: "/issues", icon: AlertTriangle },
   { name: "Impact", href: "/impact", icon: BarChart3 },
+  { name: "Admin", href: "/admin", icon: Shield },
 ]
 
 export function MobileNav() {
