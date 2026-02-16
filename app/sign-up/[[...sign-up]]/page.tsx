@@ -2,6 +2,7 @@ import { SignUp } from "@clerk/nextjs";
 
 export default function Page() {
     return (
+<<<<<<< HEAD
         <div
             className="min-h-screen flex items-center justify-center relative overflow-hidden"
             style={{
@@ -55,6 +56,10 @@ export default function Page() {
                     />
                 </div>
             </div>
+=======
+        <div className="flex justify-center items-center py-24">
+            <SignUp path="/sign-up" forceRedirectUrl="/dashboard" />
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
         </div>
     );
 }

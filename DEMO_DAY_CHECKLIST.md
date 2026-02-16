@@ -64,10 +64,16 @@
   - Browser tabs organized:
     - Tab 1: Home page
     - Tab 2: Dashboard
+<<<<<<< HEAD
     - Tab 3: Trees (ready to upload & adopt)
     - Tab 4: Issues
     - Tab 5: Impact (showing badges)
     - Tab 6: Admin
+=======
+    - Tab 3: Trees (ready to upload)
+    - Tab 4: Issues
+    - Tab 5: Impact
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
   - Clear browser cache
   - Disable notifications
   - Close unnecessary apps
@@ -98,7 +104,10 @@
 - [ ] Show tree inventory
 - [ ] Click "Upload Tree"
 - [ ] Upload prepared tree photo
+<<<<<<< HEAD
 - [ ] **Demonstrate "Adopt Me" functionality**
+=======
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 - [ ] Fill in location/species
 - [ ] Submit and wait for AI analysis
 - [ ] Show Gemini API health assessment
@@ -119,9 +128,12 @@
   - ✅ All-in-one platform
   - ✅ Gamified engagement
   - ✅ Measurable impact
+<<<<<<< HEAD
   - ✅ **Tree Adoption & Achievement Badges**
   - ✅ **Campus Condition Health monitoring**
   - ✅ **Admin control panel**
+=======
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 
 ### Q&A Preparation
 - [ ] Be ready to explain tech stack
@@ -209,7 +221,11 @@
 - **42** civic issues tracked
 - **28** issues resolved
 - **87/100** green score
+<<<<<<< HEAD
 - **6** main features (Dashboard, Trees, Issues, Impact, Admin, Home)
+=======
+- **5** main features (pages)
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 
 ---
 
@@ -310,7 +326,11 @@ In case of demo failures, have screenshots of:
 ## ✅ Final Pre-Demo Checklist (5 minutes before)
 
 - [ ] Live site loads perfectly
+<<<<<<< HEAD
 - [ ] All 6 pages accessible
+=======
+- [ ] All 5 pages accessible
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 - [ ] AI analysis tested and working
 - [ ] Printed materials on table
 - [ ] Laptop fully charged

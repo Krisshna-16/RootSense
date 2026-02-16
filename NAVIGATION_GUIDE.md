@@ -215,11 +215,20 @@ Ctrl + C (in terminal)
 
 ### Must-See Features
 - [ ] Landing page hero section
+<<<<<<< HEAD
 - [ ] **Dashboard**: High-level metrics, charts, and activity feed. Now includes **Campus Condition** data.
 - [ ] **Trees**: Tree monitoring and AI health analysis. Now includes **Tree Adoption** system.
 - [ ] **Civic Issues**: Reporting and tracking campus environmental issues.
 - [ ] **Impact**: Environmental impact metrics and leaderboards. Now includes **Achievement Badges**.
 - [ ] **Admin**: Administrative tools for managing the platform.
+=======
+- [ ] Dashboard metrics and charts
+- [ ] Tree inventory with photos
+- [ ] AI tree health analysis
+- [ ] Civic issue reporting
+- [ ] Department leaderboards
+- [ ] Responsive mobile menu
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 - [ ] User authentication (Clerk)
 
 ### Interactive Elements
@@ -235,6 +244,7 @@ Ctrl + C (in terminal)
 ## 🔑 Key Selling Points
 
 1. **AI-Powered** - Gemini API for tree health analysis
+<<<<<<< HEAD
 2. **Achievement Badges**: Recognition for sustainability contributions.
 3. **Impact Visualizers**: View water saved, CO2 reduced, and energy saved metrics.
 4. **Community Impact**: Enhanced social and health benefit fields.
@@ -243,6 +253,12 @@ Ctrl + C (in terminal)
 7. **Gamified** - Department leaderboards drive engagement
 8. **Real-Time** - Live activity feed and metrics
 9. **Responsive** - Works on all devices
+=======
+2. **Comprehensive** - Trees + Issues + Impact in one platform
+3. **Gamified** - Department leaderboards drive engagement
+4. **Real-Time** - Live activity feed and metrics
+5. **Responsive** - Works on all devices
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 
 ---
 

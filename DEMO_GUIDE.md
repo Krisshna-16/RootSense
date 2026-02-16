@@ -92,7 +92,10 @@ Navigate to: **http://localhost:3000**
 2. **Civic Issues**: 42 total (28 resolved, 14 open)
 3. **Water Saved**: 24,560 liters this month
 4. **Green Score**: 87/100 (Excellent rating)
+<<<<<<< HEAD
 5. **Campus Condition (NEW)**: Real-time Soil Moisture (64%), Air Quality (42 AQI), and Temperature (28°C)
+=======
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 
 **Charts:**
 - **Tree Health Trend**: Area chart showing healthy/moderate/critical percentages over 6 months
@@ -140,7 +143,10 @@ Navigate to: **http://localhost:3000**
 - [ ] Try uploading a tree photo
 - [ ] Test filter functionality
 - [ ] Check health status indicators
+<<<<<<< HEAD
 - [ ] **Try "Adopt Me" button** to see adoption status
+=======
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 
 ---
 
@@ -209,8 +215,11 @@ Navigate to: **http://localhost:3000**
 - [ ] Check department rankings
 - [ ] Understand scoring methodology
 - [ ] Note gamification approach
+<<<<<<< HEAD
 - [ ] **View Sustainability Milestones & Volunteer Badges**
 - [ ] Check enhanced Community Impact metrics (Public Health & Property Value)
+=======
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 
 ---
 

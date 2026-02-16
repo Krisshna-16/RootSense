@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+<<<<<<< HEAD
+=======
+    "baseUrl": ".",
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
     "lib": [
       "dom",
       "dom.iterable",
@@ -38,4 +42,8 @@
   "exclude": [
     "node_modules"
   ]
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3

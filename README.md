@@ -58,10 +58,17 @@ The application has **5 main sections** accessible via the sidebar (desktop) or 
 | Section | URL | Description |
 |---------|-----|-------------|
 | **🏠 Home** | `/` | Landing page with overview and features |
+<<<<<<< HEAD
 | **📊 Dashboard** | `/dashboard` | Real-time metrics and **Campus Condition Health Index** |
 | **🌲 Trees** | `/trees` | Monitoring, AI health analysis, and **Tree Adoption system** |
 | **⚠️ Civic Issues** | `/issues` | Report and track campus environmental issues |
 | **📈 Impact** | `/impact` | Metrics, leaderboards, and **Achievement Badges** |
+=======
+| **📊 Dashboard** | `/dashboard` | Real-time sustainability metrics and analytics |
+| **🌲 Trees** | `/trees` | Tree monitoring and AI health analysis |
+| **⚠️ Civic Issues** | `/issues` | Report and track campus environmental issues |
+| **📈 Impact** | `/impact` | Environmental impact metrics and leaderboards |
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 | **🛡️ Admin** | `/admin` | User management and system control (Admin only) |
 
 ---

@@ -1,4 +1,8 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -43,8 +47,12 @@ dist/
 downloads/
 eggs/
 .eggs/
+<<<<<<< HEAD
 lib/
 lib64/
+=======
+
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
 parts/
 sdist/
 var/
@@ -234,4 +242,11 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+<<<<<<< HEAD
 >>>>>>> ba6837a23a5ae4c401448b60dedc04a4c0934736
+=======
+
+
+# clerk configuration (can include secrets)
+/.clerk/
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3

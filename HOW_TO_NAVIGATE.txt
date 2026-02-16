@@ -73,13 +73,19 @@
   2. 📊 DASHBOARD (/dashboard)
      • Real-time metrics (1,247 trees, 42 issues, etc.)
      • Interactive charts
+<<<<<<< HEAD
      • **Campus Condition Health Index** (Soil, Air, Temp)
+=======
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
      • Recent activity feed
   
   3. 🌲 TREES (/trees)
      • Tree inventory with photos
      • AI-powered health analysis ⭐ HIGHLIGHT
+<<<<<<< HEAD
      • **Tree Adoption system** (Adopt-a-Tree)
+=======
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
      • Upload and analyze tree photos
   
   4. ⚠️  CIVIC ISSUES (/issues)
@@ -89,9 +95,13 @@
   
   5. 📈 IMPACT (/impact)
      • Environmental impact metrics
+<<<<<<< HEAD
      • **Achievement Badges & Milestones**
      • Department leaderboards
      • **Community Engagement fields**
+=======
+     • Department leaderboards
+>>>>>>> c8f2ef0175ec69b4b6491dffbecacb2acba0b6d3
      • Green score breakdown
 
   6. 🛡️  ADMIN (/admin)
