@@ -34,14 +34,14 @@ export default function LandingPage() {
 
 
             <Link
-              href="/auth/login"
+              href="/sign-in"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Login
+              Sign In
             </Link>
 
             <Button variant="outline" asChild>
-              <Link href="/auth/signup">Sign Up</Link>
+              <Link href="/sign-up">Sign Up</Link>
             </Button>
           </div>
 
@@ -68,11 +68,16 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" asChild>
-              <Link href="/dashboard" className="gap-2">
-                Go to Dashboard
+              <Link href="/sign-in" className="gap-2">
+                Sign In
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
+
+            <Button variant="outline" size="lg" asChild>
+              <Link href="/sign-up">Sign Up</Link>
+            </Button>
+
             <Button variant="outline" size="lg" asChild>
               <Link href="/trees">View Tree Data</Link>
             </Button>

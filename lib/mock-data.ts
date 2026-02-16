@@ -11,16 +11,21 @@
 
 export interface Tree {
   id: string
+  tree_id?: string // Display ID like T-123
   location: string
-  health: "Healthy" | "Moderate" | "Critical"
-  lastUpdated: string
   species: string
-  age: string
-  uploadedBy: string
-  greenCoverage?: number
-  leafDensity?: number
-  waterNeeds?: "Low" | "Medium" | "High"
+  health: "Healthy" | "Moderate" | "Critical"
+  green_coverage?: number
+  leaf_density?: number
+  water_needs?: string
+  recommendation?: string
+  image_url?: string
+  confidence?: number
+  created_at?: string
+  uploaded_by?: string
 }
+
+// ... other interfaces ...
 
 export interface CivicIssue {
   id: number
@@ -66,32 +71,12 @@ export interface ActivityItem {
 // -----------------------------------------------------------------------------
 // TREES DATA
 // -----------------------------------------------------------------------------
-// FIREBASE: Replace with Firestore collection "trees"
-// const treesRef = collection(db, "trees")
-// const treesSnapshot = await getDocs(query(treesRef, orderBy("lastUpdated", "desc")))
-// -----------------------------------------------------------------------------
-
 export const TREES_DATA: Tree[] = [
-  { id: "T-1247", location: "Block A, Engineering Building", health: "Healthy", lastUpdated: "2026-01-30", species: "Neem", age: "12 years", uploadedBy: "Priya Sharma" },
-  { id: "T-1246", location: "Library Lawn - North Side", health: "Moderate", lastUpdated: "2026-01-29", species: "Banyan", age: "45 years", uploadedBy: "Rahul Verma" },
-  { id: "T-1245", location: "Sports Complex Entrance", health: "Healthy", lastUpdated: "2026-01-29", species: "Mango", age: "8 years", uploadedBy: "Anita Desai" },
-  { id: "T-1244", location: "Central Garden - Fountain Area", health: "Critical", lastUpdated: "2026-01-28", species: "Gulmohar", age: "15 years", uploadedBy: "Vikram Singh" },
-  { id: "T-1243", location: "Hostel A Main Entrance", health: "Healthy", lastUpdated: "2026-01-28", species: "Ashoka", age: "6 years", uploadedBy: "Meera Patel" },
-  { id: "T-1242", location: "Admin Block - West Garden", health: "Moderate", lastUpdated: "2026-01-27", species: "Peepal", age: "52 years", uploadedBy: "Suresh Kumar" },
-  { id: "T-1241", location: "Canteen Outdoor Seating", health: "Healthy", lastUpdated: "2026-01-27", species: "Coconut", age: "18 years", uploadedBy: "Neha Gupta" },
-  { id: "T-1240", location: "Parking Lot B - East Corner", health: "Critical", lastUpdated: "2026-01-26", species: "Tamarind", age: "22 years", uploadedBy: "Arjun Reddy" },
-  { id: "T-1239", location: "Science Block Courtyard", health: "Healthy", lastUpdated: "2026-01-26", species: "Neem", age: "10 years", uploadedBy: "Kavita Iyer" },
-  { id: "T-1238", location: "Arts Building - Main Gate", health: "Healthy", lastUpdated: "2026-01-25", species: "Mango", age: "14 years", uploadedBy: "Amit Joshi" },
-  { id: "T-1237", location: "Hostel B - Rear Garden", health: "Moderate", lastUpdated: "2026-01-25", species: "Jamun", age: "9 years", uploadedBy: "Divya Nair" },
-  { id: "T-1236", location: "Computer Lab Building", health: "Healthy", lastUpdated: "2026-01-24", species: "Teak", age: "7 years", uploadedBy: "Rohan Mehta" },
-  { id: "T-1235", location: "Auditorium Lawn", health: "Healthy", lastUpdated: "2026-01-24", species: "Flame of Forest", age: "11 years", uploadedBy: "Sneha Rao" },
-  { id: "T-1234", location: "Faculty Quarters - Block C", health: "Critical", lastUpdated: "2026-01-23", species: "Rain Tree", age: "35 years", uploadedBy: "Dr. Ramesh" },
-  { id: "T-1233", location: "Main Gate Avenue", health: "Healthy", lastUpdated: "2026-01-23", species: "Mahogany", age: "20 years", uploadedBy: "Security Staff" },
-  { id: "T-1232", location: "Gym Building Side", health: "Moderate", lastUpdated: "2026-01-22", species: "Jackfruit", age: "16 years", uploadedBy: "Fitness Club" },
-  { id: "T-1231", location: "Research Center Garden", health: "Healthy", lastUpdated: "2026-01-22", species: "Sandalwood", age: "5 years", uploadedBy: "Dr. Lakshmi" },
-  { id: "T-1230", location: "Cafeteria Backside", health: "Healthy", lastUpdated: "2026-01-21", species: "Curry Leaf", age: "3 years", uploadedBy: "Canteen Staff" },
-  { id: "T-1229", location: "Workshop Building", health: "Critical", lastUpdated: "2026-01-21", species: "Bamboo Grove", age: "8 years", uploadedBy: "Workshop Head" },
-  { id: "T-1228", location: "Botanical Garden - Section A", health: "Healthy", lastUpdated: "2026-01-20", species: "Ficus", age: "25 years", uploadedBy: "Botany Dept" },
+  { id: "1", tree_id: "T-1247", location: "Block A, Engineering Building", health: "Healthy", created_at: "2026-01-30", species: "Neem", uploaded_by: "Priya Sharma", green_coverage: 85, leaf_density: 70, water_needs: "Low" },
+  { id: "2", tree_id: "T-1246", location: "Library Lawn - North Side", health: "Moderate", created_at: "2026-01-29", species: "Banyan", uploaded_by: "Rahul Verma", green_coverage: 60, leaf_density: 55, water_needs: "Medium" },
+  { id: "3", tree_id: "T-1245", location: "Sports Complex Entrance", health: "Healthy", created_at: "2026-01-29", species: "Mango", uploaded_by: "Anita Desai", green_coverage: 80, leaf_density: 75, water_needs: "Low" },
+  { id: "4", tree_id: "T-1244", location: "Central Garden - Fountain Area", health: "Critical", created_at: "2026-01-28", species: "Gulmohar", uploaded_by: "Vikram Singh", green_coverage: 40, leaf_density: 30, water_needs: "High" },
+  { id: "5", tree_id: "T-1243", location: "Hostel A Main Entrance", health: "Healthy", created_at: "2026-01-28", species: "Ashoka", uploaded_by: "Meera Patel", green_coverage: 88, leaf_density: 80, water_needs: "Low" },
 ]
 
 // -----------------------------------------------------------------------------

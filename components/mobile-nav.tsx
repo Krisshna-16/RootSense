@@ -6,6 +6,7 @@ import { useState } from "react"
 import { LayoutDashboard, TreePine, AlertTriangle, BarChart3, Leaf, Home, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { UserButton } from "@clerk/nextjs"
 
 const navigation = [
   { name: "Home", href: "/", icon: Home },
@@ -29,21 +30,24 @@ export function MobileNav() {
           </div>
           <span className="font-bold text-foreground">ROOTSENSE</span>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        <div className="flex items-center gap-4">
+          <UserButton afterSignOutUrl="/" />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </header>
 
       {/* Mobile Menu Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div 
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm" 
+          <div
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
             onClick={() => setIsOpen(false)}
             onKeyDown={(e) => e.key === 'Escape' && setIsOpen(false)}
           />

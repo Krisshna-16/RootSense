@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react"
 import { TreePine, Upload, MapPin, Calendar, Search, Filter, Loader2, CheckCircle2, Leaf, Droplets, Sun, Info } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { analyzeTreeImage } from "@/lib/gemini"
+import { getTrees, addTree } from "@/lib/services"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -32,21 +33,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-interface Tree {
-  id: string
-  tree_id: string
-  location: string
-  species: string
-  health: "Healthy" | "Moderate" | "Critical"
-  green_coverage: number
-  leaf_density: number
-  water_needs: string
-  recommendation: string
-  image_url: string
-  confidence: number
-  created_at?: string
-  uploaded_by?: string
-}
+import { Tree } from "@/lib/mock-data"
+import { CameraCapture } from "@/components/camera-capture"
 
 const healthColors = {
   Healthy: "bg-primary text-primary-foreground",
@@ -71,8 +59,6 @@ const locationMap: Record<string, string> = {
   "other": "Other",
 }
 
-// Mock analysis function removed as we now use real AI
-
 export default function TreesPage() {
   const [trees, setTrees] = useState<Tree[]>([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -80,10 +66,17 @@ export default function TreesPage() {
 
   // UI State
   const [isUploadOpen, setIsUploadOpen] = useState(false)
+  const [isCameraOpen, setIsCameraOpen] = useState(false) // New state for camera
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisComplete, setAnalysisComplete] = useState(false)
-  // Define analysis result type based on Gemini response
+
+  // Editable Analysis State
   const [analysisResult, setAnalysisResult] = useState<any>(null)
+  const [editableSpecies, setEditableSpecies] = useState("")
+  const [editableHealth, setEditableHealth] = useState<string>("")
+  const [editableGreenCoverage, setEditableGreenCoverage] = useState(0)
+  const [editableLeafDensity, setEditableLeafDensity] = useState(0)
+  const [editableWaterNeeds, setEditableWaterNeeds] = useState("")
 
   // Upload Logic State
   const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null)
@@ -95,20 +88,8 @@ export default function TreesPage() {
   useEffect(() => {
     const fetchTrees = async () => {
       try {
-        const { data, error } = await supabase
-          .from("trees")
-          .select("*")
-          .order('created_at', { ascending: false })
-
-        // Only log error if it's not a schema cache issue
-        if (error && !error.message.includes("schema cache")) {
-          console.error("Error loading trees:", error)
-        }
-
-        // Set data even if there's a schema cache warning
-        if (data) {
-          setTrees(data as Tree[])
-        }
+        const data = await getTrees()
+        setTrees(data)
       } catch (err) {
         console.error("Unexpected error loading trees:", err)
       }
@@ -118,32 +99,62 @@ export default function TreesPage() {
   }, [])
 
   // Handle file selection and AI analysis
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setSelectedFile(file)
-      const reader = new FileReader()
-      reader.onloadend = async () => {
-        setUploadedImagePreview(reader.result as string)
+  const handleFileProcess = async (file: File) => {
+    setSelectedFile(file)
+    const reader = new FileReader()
+    reader.onloadend = async () => {
+      setUploadedImagePreview(reader.result as string)
+      setIsCameraOpen(false) // Close camera if open
 
-        // Start real AI analysis with Gemini
-        setIsAnalyzing(true)
-        setAnalysisComplete(false)
-        setAnalysisResult(null)
+      // Start real AI analysis with Gemini
+      setIsAnalyzing(true)
+      setAnalysisComplete(false)
+      setAnalysisResult(null)
 
-        try {
-          const analysis = await analyzeTreeImage(file)
-          setAnalysisResult(analysis)
-          setIsAnalyzing(false)
-          setAnalysisComplete(true)
-        } catch (error: any) {
-          console.error("AI analysis failed:", error)
-          setIsAnalyzing(false)
-          alert(`Error: ${error.message || "Something went wrong"}`)
-        }
+      try {
+        const analysis = await analyzeTreeImage(file)
+        setAnalysisResult(analysis)
+
+        // Set initial editable values
+        setEditableSpecies(analysis.detectedSpecies)
+        setEditableHealth(analysis.healthStatus)
+        setEditableGreenCoverage(analysis.greenCoverage)
+        setEditableLeafDensity(analysis.leafDensity)
+        setEditableWaterNeeds(analysis.waterNeeds)
+
+        setIsAnalyzing(false)
+        setAnalysisComplete(true)
+      } catch (error: any) {
+        console.error("AI analysis failed:", error)
+        setIsAnalyzing(false)
+        alert(`Error: ${error.message || "Something went wrong"}`)
       }
-      reader.readAsDataURL(file)
     }
+    reader.readAsDataURL(file)
+  }
+
+  // Removed handleImageUpload as file upload is no longer allowed
+
+  const handleCameraCapture = (file: File) => {
+    handleFileProcess(file)
+  }
+
+  const AREAS = [
+    { id: "BLK-A", label: "Block A, Engineering Building" },
+    { id: "LIB-G", label: "Library Lawn" },
+    { id: "SPT-C", label: "Sports Complex" },
+    { id: "GDN-C", label: "Central Garden" },
+    { id: "HST-A", label: "Hostel A Entrance" },
+    { id: "ADM-B", label: "Admin Block" },
+    { id: "CNT-A", label: "Canteen Area" },
+    { id: "OTH", label: "Other" },
+  ]
+
+  const handleAreaChange = (areaId: string) => {
+    setNewTreeLocation(areaId)
+    // Auto-generate Tree ID based on Area
+    const randomNum = Math.floor(1000 + Math.random() * 9000)
+    setNewTreeId(`${areaId}-${randomNum}`)
   }
 
   // Save data to Supabase
@@ -153,6 +164,8 @@ export default function TreesPage() {
     try {
       const treeId = newTreeId || `T-${Date.now()}`
       const fileName = `${treeId}-${Date.now()}.${selectedFile.name.split('.').pop()}`
+      const selectedArea = AREAS.find(a => a.id === newTreeLocation)
+      const locationName = selectedArea ? selectedArea.label : "Unknown Location"
 
       // 1. Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -172,31 +185,26 @@ export default function TreesPage() {
 
       const publicUrl = urlData.publicUrl
 
-      // 3. Insert into Supabase Database
+      // 3. Insert into Supabase Database via Service
       const newTreePayload = {
         tree_id: treeId,
-        location: locationMap[newTreeLocation] || newTreeLocation || "Unknown Location",
-        species: analysisResult.detectedSpecies,
-        health: analysisResult.healthStatus, // "Healthy" | "Moderate" | "Critical"
-        green_coverage: analysisResult.greenCoverage,
-        leaf_density: analysisResult.leafDensity,
-        water_needs: analysisResult.waterNeeds,
-        recommendation: analysisResult.recommendation,
+        location: locationName,
+        species: editableSpecies, // Use editable value
+        health: editableHealth as "Healthy" | "Moderate" | "Critical", // Use editable value
+        green_coverage: editableGreenCoverage, // Use editable value
+        leaf_density: editableLeafDensity, // Use editable value
+        water_needs: editableWaterNeeds, // Use editable value
+        recommendation: analysisResult.recommendation, // Keep AI recommendation or make editable too if needed
         image_url: publicUrl,
         confidence: analysisResult.confidence,
         // Optional: uploaded_by if user auth is set up
       }
 
-      const { data: insertData, error: insertError } = await supabase
-        .from("trees")
-        .insert([newTreePayload])
-        .select() // Select returned data to update local state more robustly if needed
-
-      if (insertError) throw insertError
+      await addTree(newTreePayload)
 
       // 4. Refresh List
-      const { data: refreshedData } = await supabase.from("trees").select("*").order('created_at', { ascending: false })
-      if (refreshedData) setTrees(refreshedData as Tree[])
+      const refreshedData = await getTrees()
+      setTrees(refreshedData)
 
       // 5. Reset UI
       handleDialogClose(false)
@@ -214,6 +222,7 @@ export default function TreesPage() {
     setIsAnalyzing(false)
     setAnalysisComplete(false)
     setAnalysisResult(null)
+    setIsCameraOpen(false)
     setNewTreeId("")
     setNewTreeLocation("")
   }
@@ -224,6 +233,7 @@ export default function TreesPage() {
   }
 
   const filteredTrees = trees.filter((tree) => {
+    // ... existing filter logic
     const searchLower = searchQuery.toLowerCase()
     const matchesSearch =
       tree.tree_id?.toLowerCase().includes(searchLower) ||
@@ -235,6 +245,7 @@ export default function TreesPage() {
     return matchesSearch && matchesHealth
   })
 
+  // ... stats logic
   const stats = {
     total: trees.length,
     healthy: trees.filter((t) => t.health === "Healthy").length,
@@ -254,61 +265,65 @@ export default function TreesPage() {
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Upload className="h-4 w-4" />
-              Upload Tree Photo
+              Add Tree
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Upload Tree Photo for AI Analysis</DialogTitle>
+              <DialogTitle>Add New Tree</DialogTitle>
               <DialogDescription>
-                AI will analyze tree health and save results to Supabase Database.
+                Select an area and capture a photo to analyze tree health.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              {!uploadedImagePreview ? (
+              {!uploadedImagePreview && !isCameraOpen ? (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="tree-id">Tree ID (optional)</Label>
-                    <Input
-                      id="tree-id"
-                      placeholder="e.g., T-1248"
-                      value={newTreeId}
-                      onChange={(e) => setNewTreeId(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="location">Location</Label>
-                    <Select value={newTreeLocation} onValueChange={setNewTreeLocation}>
+                    <Label htmlFor="location">Area / Location</Label>
+                    <Select value={newTreeLocation} onValueChange={handleAreaChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select location" />
+                        <SelectValue placeholder="Select Area" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="block-a">Block A, Engineering Building</SelectItem>
-                        <SelectItem value="library">Library Lawn</SelectItem>
-                        <SelectItem value="sports">Sports Complex</SelectItem>
-                        <SelectItem value="garden">Central Garden</SelectItem>
-                        <SelectItem value="hostel-a">Hostel A Entrance</SelectItem>
-                        <SelectItem value="admin">Admin Block</SelectItem>
-                        <SelectItem value="canteen">Canteen Area</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                        {AREAS.map((area) => (
+                          <SelectItem key={area.id} value={area.id}>{area.label} ({area.id})</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
+
                   <div className="space-y-2">
-                    <Label>Upload Photo</Label>
-                    <label className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/30 transition-colors hover:border-primary/50 hover:bg-muted/50">
-                      <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">Click/Drag to upload</p>
-                      <p className="text-xs text-muted-foreground">PNG, JPG up to 10MB</p>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageUpload}
-                      />
-                    </label>
+                    <Label htmlFor="tree-id">Tree ID (Auto-generated)</Label>
+                    <Input
+                      id="tree-id"
+                      value={newTreeId}
+                      readOnly
+                      className="bg-muted font-mono"
+                      placeholder="Select an area first"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <Button
+                      variant="outline"
+                      className="w-full h-32 flex flex-col gap-2 border-dashed border-2 hover:border-primary/50 hover:bg-muted/50"
+                      onClick={() => setIsCameraOpen(true)}
+                      disabled={!newTreeLocation} // Force area selection first
+                    >
+                      <CheckCircle2 className="h-10 w-10 text-primary" />
+                      <span className="text-lg font-semibold">Take Photo</span>
+                      <span className="text-xs text-muted-foreground">Camera required for verification</span>
+                    </Button>
+                    {!newTreeLocation && (
+                      <p className="text-xs text-destructive text-center mt-2">Please select an Area first.</p>
+                    )}
                   </div>
                 </>
+              ) : isCameraOpen ? (
+                <CameraCapture
+                  onCapture={handleCameraCapture}
+                  onCancel={() => setIsCameraOpen(false)}
+                />
               ) : (
                 <div className="space-y-4">
                   {/* Uploaded Image Preview */}
@@ -322,77 +337,103 @@ export default function TreesPage() {
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
                         <Loader2 className="mb-3 h-8 w-8 animate-spin text-primary" />
                         <p className="text-sm font-medium text-foreground">AI Analyzing Tree...</p>
-                        <p className="text-xs text-muted-foreground">Detecting health indicators</p>
                       </div>
                     )}
                   </div>
 
-                  {/* Analysis Results */}
+                  {/* Analysis Results (Editable) */}
                   {analysisComplete && analysisResult && (
                     <div className="space-y-4 rounded-lg border border-primary/30 bg-primary/5 p-4">
                       <div className="flex items-center gap-2 text-primary">
                         <CheckCircle2 className="h-5 w-5" />
                         <span className="font-semibold">AI Analysis Complete</span>
-                        <Badge variant="outline" className="ml-auto text-xs">
-                          {analysisResult.confidence}% confidence
-                        </Badge>
+                        {analysisResult.isMock && (
+                          <Badge variant="destructive" className="ml-2">
+                            SIMULATION
+                          </Badge>
+                        )}
                       </div>
 
-                      <div className="flex items-center justify-between rounded-md bg-card p-3">
-                        <span className="text-sm font-medium text-foreground">Health Status</span>
-                        <Badge className={healthColors[analysisResult.healthStatus as keyof typeof healthColors]}>
-                          {analysisResult.healthStatus}
-                        </Badge>
-                      </div>
-
-                      <div className="flex items-center justify-between rounded-md bg-card p-3">
-                        <span className="text-sm font-medium text-foreground">Detected Species</span>
-                        <span className="text-sm text-muted-foreground">{analysisResult.detectedSpecies}</span>
-                      </div>
-
-                      <div className="grid gap-3 sm:grid-cols-3">
-                        <div className="rounded-md bg-card p-3">
-                          <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <Leaf className="h-3.5 w-3.5" />
-                            Green Coverage
-                          </div>
-                          <div className="mb-1 text-lg font-semibold text-foreground">{analysisResult.greenCoverage}%</div>
-                          <Progress value={analysisResult.greenCoverage} className="h-1.5" />
+                      {analysisResult.isMock && (
+                        <div className="rounded-md border border-yellow-500/50 bg-yellow-500/10 p-3 text-sm text-yellow-600 dark:text-yellow-400">
+                          <p className="font-semibold">⚠️ AI Service Busy</p>
+                          <p>We hit the free tier rate limit. Results are simulated.</p>
                         </div>
-                        <div className="rounded-md bg-card p-3">
-                          <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <Sun className="h-3.5 w-3.5" />
-                            Leaf Density
-                          </div>
-                          <div className="mb-1 text-lg font-semibold text-foreground">{analysisResult.leafDensity}%</div>
-                          <Progress value={analysisResult.leafDensity} className="h-1.5" />
+                      )}
+
+                      <div className="space-y-3">
+                        {/* Species */}
+                        <div className="space-y-1">
+                          <Label>Detected Species</Label>
+                          <Input
+                            value={editableSpecies}
+                            onChange={(e) => setEditableSpecies(e.target.value)}
+                            className="bg-background"
+                          />
                         </div>
-                        <div className="rounded-md bg-card p-3">
-                          <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <Droplets className="h-3.5 w-3.5" />
-                            Water Needs
+
+                        {/* Health */}
+                        <div className="space-y-1">
+                          <Label>Health Status</Label>
+                          <Select value={editableHealth} onValueChange={setEditableHealth}>
+                            <SelectTrigger className="bg-background">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Healthy">Healthy</SelectItem>
+                              <SelectItem value="Moderate">Moderate</SelectItem>
+                              <SelectItem value="Critical">Critical</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Metrics */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label>Green Coverage (%)</Label>
+                            <Input
+                              type="number"
+                              value={editableGreenCoverage}
+                              onChange={(e) => setEditableGreenCoverage(Number(e.target.value))}
+                              className="bg-background"
+                            />
                           </div>
-                          <div className="text-lg font-semibold text-foreground">{analysisResult.waterNeeds}</div>
+                          <div className="space-y-1">
+                            <Label>Leaf Density (%)</Label>
+                            <Input
+                              type="number"
+                              value={editableLeafDensity}
+                              onChange={(e) => setEditableLeafDensity(Number(e.target.value))}
+                              className="bg-background"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label>Water Needs</Label>
+                          <Select value={editableWaterNeeds} onValueChange={setEditableWaterNeeds}>
+                            <SelectTrigger className="bg-background">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Low">Low</SelectItem>
+                              <SelectItem value="Medium">Medium</SelectItem>
+                              <SelectItem value="High">High</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
 
-                      <div className="rounded-md bg-card p-3">
-                        <p className="mb-1 text-xs font-medium text-muted-foreground">AI Recommendation</p>
-                        <p className="text-sm text-foreground">{analysisResult.recommendation}</p>
+                      <div className="flex gap-2 pt-2">
+                        <Button variant="outline" onClick={resetUpload} className="flex-1 bg-transparent">
+                          Retake
+                        </Button>
+                        <Button className="flex-1" onClick={saveTreeData}>
+                          Save Tree
+                        </Button>
                       </div>
                     </div>
                   )}
-
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={resetUpload} className="flex-1 bg-transparent">
-                      Upload Different Photo
-                    </Button>
-                    {analysisComplete && (
-                      <Button className="flex-1" onClick={saveTreeData}>
-                        Save to Supabase
-                      </Button>
-                    )}
-                  </div>
                 </div>
               )}
             </div>
@@ -400,7 +441,7 @@ export default function TreesPage() {
         </Dialog>
       </div>
 
-      {/* Info Card */}
+      {/* Info Card - Keeping same */}
       <Card className="mb-6 border-chart-2/30 bg-chart-2/5">
         <CardContent className="flex items-start gap-3 p-4">
           <Info className="mt-0.5 h-5 w-5 shrink-0 text-chart-2" />
@@ -415,8 +456,11 @@ export default function TreesPage() {
         </CardContent>
       </Card>
 
-      {/* Stats Summary */}
+      {/* Stats Summary - Keeping same */}
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
+        {/* ... stats cards ... */}
+        {/* Reusing existing code structure heavily here for brevity in replacement block, 
+             but ensuring the stats logic remains accessible via the closure */}
         <Card className="border-border bg-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -428,6 +472,7 @@ export default function TreesPage() {
             </div>
           </CardContent>
         </Card>
+        {/* ... other cards ... */}
         <Card className="border-border bg-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -463,7 +508,7 @@ export default function TreesPage() {
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Filters - Keeping same */}
       <Card className="mb-6 border-border bg-card">
         <CardContent className="p-4">
           <div className="flex flex-col gap-4 sm:flex-row">
@@ -492,7 +537,7 @@ export default function TreesPage() {
         </CardContent>
       </Card>
 
-      {/* Trees Grid */}
+      {/* Trees Grid - Keeping same */}
       <Card className="border-border bg-card">
         <CardHeader>
           <CardTitle className="text-foreground">Trees ({filteredTrees.length})</CardTitle>

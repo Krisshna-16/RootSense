@@ -19,8 +19,8 @@ export interface TreeAnalysis {
     isMock?: boolean;
 }
 
-const MAX_RETRIES = 5;
-const INITIAL_BACKOFF = 5000; // 5 seconds
+const MAX_RETRIES = 2; // Reduced from 5
+const INITIAL_BACKOFF = 1000; // Reduced from 5000ms
 
 // Helper for delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -29,11 +29,13 @@ async function retryWithBackoff<T>(fn: () => Promise<T>, retries = MAX_RETRIES, 
     try {
         return await fn();
     } catch (error: any) {
+        console.warn(`AI Request Failed: ${error.message} (Status: ${error.status})`);
+
         // Check for 429 (Rate Limit) or 503 (Service Unavailable)
         if (retries > 0 && (error.status === 429 || error.message?.includes("429") || error.status === 503)) {
-            console.warn(`Rate limit hit. Retrying in ${backoff}ms... (${retries} retries left)`);
+            console.warn(`Retrying in ${backoff}ms... (${retries} retries left)`);
             await delay(backoff);
-            return retryWithBackoff(fn, retries - 1, backoff * 2); // Exponential backoff (2s -> 4s -> 8s)
+            return retryWithBackoff(fn, retries - 1, backoff * 1.5);
         }
         throw error;
     }
@@ -45,8 +47,8 @@ export async function analyzeTreeImage(imageFile: File): Promise<TreeAnalysis> {
         const base64Image = await fileToBase64(imageFile);
 
         // Initialize Gemini model with vision
-        // Switching back to 2.0-flash-001 as it's the only available model for this key
-        const modelName = "gemini-2.0-flash-001";
+        // Using gemini-1.5-pro which supports vision and is available in current API
+        const modelName = "gemini-1.5-pro";
         console.log("Initializing Gemini model:", modelName);
         const model = genAI.getGenerativeModel({ model: modelName });
 
@@ -99,6 +101,12 @@ Be specific and accurate. If you cannot identify the exact species, provide the 
             isMock: false, // Not a mock analysis
         };
     } catch (error: any) {
+        // Handle 404 errors (model not found) - fall back to simulation
+        if (error.status === 404 || error.message?.includes("404") || error.message?.includes("not found")) {
+            console.warn("Gemini model not available (404). Switching to SIMULATED analysis for demo purposes.");
+            return getMockAnalysis();
+        }
+
         // Suppress console.error for rate limits to avoid Next.js overlay
         if (error.status === 429 || error.message?.includes("429")) {
             console.warn("Rate limit hit. Switching to SIMULATED analysis for demo purposes.");

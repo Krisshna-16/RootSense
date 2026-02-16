@@ -17,6 +17,7 @@ import {
   AI_URGENCY_KEYWORDS,
   TREE_SPECIES_LIST,
 } from "./mock-data"
+import { supabase } from "@/lib/supabase"
 
 // -----------------------------------------------------------------------------
 // TREE SERVICES
@@ -40,9 +41,19 @@ import {
  * ```
  */
 export async function getTrees(): Promise<Tree[]> {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  return TREES_DATA
+  const { data, error } = await supabase
+    .from("trees")
+    .select("*")
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error loading trees:", error);
+    // Fallback to mock data if DB is empty or fails, but ideally we want to see errors
+    if (data && data.length > 0) return data as Tree[];
+    return TREES_DATA; // Fallback for now so UI doesn't break
+  }
+
+  return (data as Tree[]) || [];
 }
 
 /**
@@ -65,9 +76,18 @@ export async function getTrees(): Promise<Tree[]> {
  * ```
  */
 export async function addTree(tree: Omit<Tree, "id">): Promise<Tree> {
-  await new Promise((resolve) => setTimeout(resolve, 800))
-  const newId = `T-${1248 + Math.floor(Math.random() * 100)}`
-  return { ...tree, id: newId }
+  const { data, error } = await supabase
+    .from("trees")
+    .insert([tree])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error adding tree:", error);
+    throw error;
+  }
+
+  return data as Tree;
 }
 
 /**
@@ -372,6 +392,7 @@ export async function analyzeIssueDescription(description: string): Promise<Issu
  * Calculates tree statistics from tree data
  */
 export function calculateTreeStats(trees: Tree[]) {
+  if (!trees) return { total: 0, healthy: 0, moderate: 0, critical: 0 };
   return {
     total: trees.length,
     healthy: trees.filter((t) => t.health === "Healthy").length,

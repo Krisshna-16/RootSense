@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LayoutDashboard, TreePine, AlertTriangle, BarChart3, Leaf, Home } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { UserButton, useUser } from "@clerk/nextjs"
 
 const navigation = [
   { name: "Home", href: "/", icon: Home },
@@ -15,6 +16,7 @@ const navigation = [
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { user } = useUser()
 
   return (
     <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
@@ -48,9 +50,15 @@ export function AppSidebar() {
         })}
       </nav>
 
-      {/* Footer */}
+      {/* Footer / User Profile */}
       <div className="border-t border-sidebar-border p-4">
-        <p className="text-xs text-sidebar-foreground/50">Hackathon Demo v1.0</p>
+        <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent/10 p-3">
+          <UserButton afterSignOutUrl="/" showName />
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-sidebar-foreground">{user?.fullName || "User"}</span>
+            <span className="text-xs text-sidebar-foreground/60">{user?.primaryEmailAddress?.emailAddress}</span>
+          </div>
+        </div>
       </div>
     </aside>
   )
